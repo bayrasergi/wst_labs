@@ -19,16 +19,19 @@ public class ShipWebServiceImpl implements ShipWebService {
         return new PostgresSQLDAO().getShips();
     }
 
+    @Override
     @WebMethod(operationName = "createShip")
     public int createShip(@WebParam(name = "ship") Ship ship) {
         return new PostgresSQLDAO().createShip(ship);
     }
 
+    @Override
     @WebMethod(operationName = "updateShip")
     public boolean updateShip(@WebParam(name = "shipEdits") Ship edits) {
         return new PostgresSQLDAO().updateShip(edits);
     }
 
+    @Override
     @WebMethod(operationName = "deleteShip")
     public boolean deleteShip(@WebParam(name = "shipId") int id) {
         return new PostgresSQLDAO().deleteShip(id);

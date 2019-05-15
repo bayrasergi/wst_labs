@@ -63,9 +63,10 @@ public class PostgresSQLDAO {
         if (level > 0) {
             sql.append(String.format("\"level\"=%d, ", level));
         }
-        String update = sql.substring(0, sql.length() - 2);
+        sql.delete(sql.length() - 2, sql.length() - 1);
+        sql.append(" WHERE id=").append(ship.getId());
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement statement = connection.prepareStatement(update)) {
+             PreparedStatement statement = connection.prepareStatement(sql.toString())) {
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             Logger.getLogger(PostgresSQLDAO.class.getName()).log(Level.SEVERE, null, ex);
