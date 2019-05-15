@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-enum MenuOption {ADD, PRINT, CLEAR, FIND, EXIT}
+enum MenuOption {ADD_FIELD, PRINT, CLEAR, FIND, CREATE, DELETE, UPDATE, EXIT}
 
 public class WebServiceClient {
     private boolean exit = false;
@@ -97,7 +97,7 @@ public class WebServiceClient {
         MenuOption menuOption = MenuOption.values()[option - 1];
 
         switch (menuOption) {
-            case ADD:
+            case ADD_FIELD:
                 addCondition(in);
                 break;
             case FIND:
@@ -109,6 +109,15 @@ public class WebServiceClient {
             case CLEAR:
                 clearConditions();
                 break;
+            case CREATE:
+                createShip(in);
+                break;
+            case DELETE:
+                deleteShip(in);
+                break;
+            case UPDATE:
+                updateShip(in);
+                break;
             case EXIT:
                 exit();
                 break;
@@ -117,16 +126,22 @@ public class WebServiceClient {
 
     private String getOptionText(MenuOption menuOption) {
         switch (menuOption) {
-            case ADD:
-                return "ADD field";
+            case ADD_FIELD:
+                return "Add field";
             case FIND:
-                return "FIND results";
+                return "Find results";
             case PRINT:
-                return "PRINT saved fieldsValues";
+                return "Show saved fields";
             case CLEAR:
-                return "CLEAR saved fieldsValues";
+                return "Clear saved fields";
+            case UPDATE:
+                return "Update ship";
+            case CREATE:
+                return "Create ship";
+            case DELETE:
+                return "Delete ship by id";
             case EXIT:
-                return "EXIT";
+                return "Exit";
             default:
                 return "Option not supported";
         }
@@ -149,10 +164,10 @@ public class WebServiceClient {
         System.out.println("PRINT expected field value:");
         String value = in.readLine();
 
-        SqlFieldValue condition = new SqlFieldValue(fields[fieldNumber - 1].getName(), value);
-        this.fieldsValues.add(condition);
+        SqlFieldValue field = new SqlFieldValue(fields[fieldNumber - 1].getName(), value);
+        this.fieldsValues.add(field);
 
-        System.out.println("Field's value saved: " + condition);
+        System.out.println("Field's value saved: " + field);
     }
 
     private void findResults() {
@@ -187,5 +202,76 @@ public class WebServiceClient {
             System.out.println(ship);
         }
         System.out.println("Total ships: " + ships.size());
+    }
+
+    private void createShip(BufferedReader in) throws IOException {
+        Ship ship = new Ship();
+        System.out.println("Input name:");
+        ship.setName(in.readLine());
+        System.out.println("Input nation:");
+        ship.setNation(in.readLine());
+        System.out.println("Input rarity");
+        ship.setRarity(in.readLine());
+        System.out.println("Input type:");
+        ship.setType(in.readLine());
+        System.out.println("Input level:");
+        ship.setLevel(Integer.parseInt(in.readLine()));
+        int shipId = this.shipService.getShipWebServicePort().createShip(ship);
+        if (shipId < 0) {
+            System.out.println("Error then creating ship!");
+            return;
+        }
+        System.out.println("Ship created! Id=" + shipId);
+    }
+
+    private void updateShip(BufferedReader in) throws IOException {
+        Ship ship = new Ship();
+        System.out.println("Input id:");
+        String input = in.readLine();
+        ship.setId(Integer.parseInt(input));
+        System.out.println("Input name(enter to skip):");
+        input = in.readLine();
+        if (!input.isEmpty()) {
+            ship.setName(input);
+        }
+        System.out.println("Input nation(enter to skip):");
+        input = in.readLine();
+        if (!input.isEmpty()) {
+            ship.setNation(input);
+        }
+        System.out.println("Input rarity(enter to skip):");
+        input = in.readLine();
+        if (!input.isEmpty()) {
+            ship.setRarity(input);
+        }
+        System.out.println("Input type(enter to skip):");
+        input = in.readLine();
+        if (!input.isEmpty()) {
+            ship.setType(input);
+        }
+        System.out.println("Input level(enter to skip):");
+        input = in.readLine();
+        if (!input.isEmpty()) {
+            ship.setLevel(Integer.parseInt(input));
+        } else {
+            ship.setLevel(0);
+        }
+        boolean updateResult = this.shipService.getShipWebServicePort().updateShip(ship);
+        if (!updateResult) {
+            System.out.println("Error then updating ship!");
+            return;
+        }
+        System.out.println("Ship updated!");
+    }
+
+    private void deleteShip(BufferedReader in) throws IOException {
+        System.out.println("Input ship's id:");
+        int id = Integer.parseInt(in.readLine());
+        boolean deleteResult = this.shipService.getShipWebServicePort().deleteShip(id);
+        if (!deleteResult) {
+            System.out.println("Error then deleting ship!");
+            return;
+        }
+        System.out.println("Ship deleted!");
     }
 }

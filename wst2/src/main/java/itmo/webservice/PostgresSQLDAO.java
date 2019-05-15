@@ -104,13 +104,14 @@ public class PostgresSQLDAO {
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
+                int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 String rarity = rs.getString("rarity");
                 String nation = rs.getString("nation");
                 int level = rs.getInt("level");
 
-                Ship ship = new Ship(name, nation, rarity, type, level);
+                Ship ship = new Ship(id, name, nation, rarity, type, level);
                 ships.add(ship);
             }
         } catch (SQLException ex) {

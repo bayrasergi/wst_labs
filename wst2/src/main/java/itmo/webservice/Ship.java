@@ -154,7 +154,8 @@ public class Ship {
         this.type = value;
     }
 
-    public Ship(String name, String nation, String rarity, String type, int level) {
+    public Ship(int id, String name, String nation, String rarity, String type, int level) {
+        this.id = id;
         this.name = name;
         this.nation = nation;
         this.rarity = rarity;
@@ -167,7 +168,7 @@ public class Ship {
 
     @Override
     public String toString() {
-        return String.format("name: '%s', nation: '%s', rarity: '%s', type: '%s', level: %d",
-                name, nation, rarity, type, level);
+        return String.format("id: %d, name: '%s', nation: '%s', rarity: '%s', type: '%s', level: %d",
+                id, name, nation, rarity, type, level);
     }
 }
