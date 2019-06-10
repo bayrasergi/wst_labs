@@ -1,5 +1,8 @@
 package itmo.webservice;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +13,6 @@ import static java.util.Objects.nonNull;
 
 public class PostgresSQLDAO {
     public int createShip(Ship ship) {
-        String insertSql = "INSERT INTO SHIPS(name,nation,rarity,type,level) VALUES(%s,%s,%s,%s,d)";
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement stmt = connection.prepareStatement(
                      String.format("INSERT INTO SHIP(name,nation,rarity,type,level) VALUES('%s','%s','%s','%s',%d)",
@@ -96,6 +98,44 @@ public class PostgresSQLDAO {
             ++whereCounter;
         }
         return getShipsFromStatement(sql.toString());
+    }
+
+    public User getUser(String username, String password) {
+        User user = null;
+        try (Connection connection = ConnectionUtil.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM \"users\" WHERE \"username\"='%s' AND \"password\"='%s'", username, password))) {
+            while (rs.next()) {
+                user = new User();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(PostgresSQLDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return user;
+    }
+
+    public int createUser(User user) {
+        try (Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(
+                     String.format("INSERT INTO \"users\"(\"username\",\"password\") VALUES('%s','%s')",
+                             user.getUsername(), new String(MessageDigest.getInstance("SHA-256").digest(
+                                     user.getPassword().getBytes(StandardCharsets.UTF_8)))),
+                     new String[]{"id"})) {
+            int insertedRows = stmt.executeUpdate();
+            if (insertedRows == 0) {
+                return -1;
+            }
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        } catch (SQLException | NoSuchAlgorithmException ex) {
+            Logger.getLogger(PostgresSQLDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
     }
 
     private List<Ship> getShipsFromStatement(String sql) {

@@ -1,10 +1,11 @@
-create table ship(
-                   id  bigint primary key ,
-                   name varchar(50) not null ,
-                   type varchar(100) not null ,
-                   rarity varchar(50) not null ,
-                   nation varchar(200) not null ,
-                   level integer not null default 1
+create table ship
+(
+  id     bigint primary key,
+  name   varchar(50)  not null,
+  type   varchar(100) not null,
+  rarity varchar(50)  not null,
+  nation varchar(200) not null,
+  level  integer      not null default 1
 );
 
 create sequence ship_sequence start with 11;

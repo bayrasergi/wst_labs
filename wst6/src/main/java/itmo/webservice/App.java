@@ -15,6 +15,7 @@ public class App {
         HttpServer server = null;
         try {
             ResourceConfig resourceConfig = new PackagesResourceConfig(ShipResource.class.getPackage().getName());
+            resourceConfig.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters", "itmo.webservice.AuthenticationRequestFilter");
             server = GrizzlyServerFactory.createHttpServer(BASE_URI, resourceConfig);
             server.start();
             System.in.read();
