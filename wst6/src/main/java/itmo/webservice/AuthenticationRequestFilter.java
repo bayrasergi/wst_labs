@@ -3,7 +3,6 @@ package itmo.webservice;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -15,6 +14,7 @@ import java.util.Objects;
 
 @Provider
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
+
     private User getUser(String baseAuth) {
         String usernamePass = baseAuth.replaceFirst("Basic ", "");
         String[] userInfo = new String(Base64.getDecoder().decode(usernamePass)).split(":");
